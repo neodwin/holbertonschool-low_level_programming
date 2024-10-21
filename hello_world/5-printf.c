@@ -1,6 +1,6 @@
 #include <stdio.h>
 /**
- *  main - using puts
+ *  main - using printf
  *
  * Description: bla
  * Return: always return 0 to indicate success
