@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <time.h>
 /**
-*main — entry point
+*main - value entry point
 *description - variable n is positive or negative
-*Return — 0 signifying program success
+*Return: Always 0 (Success)
 */
 
 int main(void)
