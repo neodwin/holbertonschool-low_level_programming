@@ -1,0 +1,1 @@
+README of pointers_arrays_strings
