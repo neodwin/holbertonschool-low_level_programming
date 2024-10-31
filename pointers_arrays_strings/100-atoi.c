@@ -17,7 +17,7 @@ int _atoi(char *s)
 	{
 		if (s[i] == '-')
 			n++;
-			i++;
+		i++;
 	}
 	if (s[i] == '\0')
 		return (0);
