@@ -1,0 +1,1 @@
+README of structures typedef
