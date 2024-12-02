@@ -12,18 +12,19 @@
 list_t *add_node(list_t **head, const char *str)
 {
 	list_t *store;
+	unsigned int len = 0;
 
-	if ((head != NULL) && (str != NULL))
-	{
-		store = malloc((sizeof(list_t)));
-		if (store == NULL)
-			return (NULL);
-		store->str = strdup(str);
-		store->len = strlen(str);
-		store->next = *head;
-		*head = store;
-		return (store);
-	}
+	while (str[len])
+		len++;
 
-	return (0);
+	store = malloc(sizeof(list_t));
+	if (!store)
+		return (NULL);
+
+	store->str = strdup(str);
+	store->len = len;
+	store->next = (*head);
+	(*head) = store;
+
+	return (*head);
 }
