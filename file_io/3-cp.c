@@ -1,3 +1,4 @@
+#include "main.h"
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -6,57 +7,64 @@
 #define BUFFER_SIZE 1024
 
 /**
-* error_exit - copies the content of one file to another
-* @message: Number of arguments
-* @i: Array of argument strings
-* @ptr: Array of argument strings
-* Return: 0 on success
-*/
+ * close_func - close file
+ * @file: file to close
+ */
 
-void error_exit(const char *message, int i, const char *ptr)
+void close_func(int file)
 {
-	dprintf(STDERR_FILENO, message, ptr);
-	exit(i);
+	int c = close(file);
+
+	if (c == -1)
+	{
+		dprintf(STDERR_FILENO, "Error: Can't close fd %d\n", file);
+		exit(100);
+	}
 }
 
 /**
-* main - entry point
-* @argc: Number of arguments
-* @argv: Array of argument
-* Return: 0 on success
-*/
+ * main - copy content of a file to another file
+ * @argc: number of arguments
+ * @argv: array of arguments
+ * Return: 0 (success)
+ */
 
 int main(int argc, char *argv[])
 {
-	int file_from, file_to, bytes_read, bytes_written;
-
-	char buffer[BUFFER_SIZE];
+	int file_from, file_to, read_bytes, write_bytes;
+	char *text;
 
 	if (argc != 3)
-		error_exit("Usage: cp file_from file_to\n", 97, NULL);
-
-	file_from = open(argv[1], O_RDONLY);
-	if (file_from == -1)
-		error_exit("Error: Can't read from file %s\n", 98, argv[1]);
-
-	file_to = open(argv[2], O_CREAT | O_WRONLY | O_TRUNC, 0664);
-	if (file_to == -1)
-		error_exit("Error: Can't write to %s\n", 99, argv[2]);
-
-	while ((bytes_read = read(file_from, buffer, BUFFER_SIZE)) > 0)
 	{
-		bytes_written = write(file_to, buffer, bytes_read);
-		if (bytes_written != bytes_read)
-			error_exit("Error: Can't write to %s\n", 99, argv[2]);
+		dprintf(STDERR_FILENO, "Usage: cp file_from file_to\n");
+		exit(97);
 	}
-
-	if (bytes_read == -1)
-		error_exit("Error: Can't read from file %s\n", 98, argv[1]);
-
-	if (close(file_from) == -1)
-		error_exit("Error: Can't close fd %d\n", 100, argv[1]);
-	if (close(file_to) == -1)
-		error_exit("Error: Can't close fd %d\n", 100, argv[2]);
-
+	text = malloc(sizeof(char) * 1024);
+	if (!text)
+	{
+		dprintf(STDERR_FILENO, "Error: Can't write to %s\n", argv[2]);
+		exit(99);
+	}
+	file_from = open(argv[1], O_RDONLY);
+	read_bytes = read(file_from, text, 1024);
+	file_to = open(argv[2], O_WRONLY | O_TRUNC | O_CREAT, 0664);
+	do {
+		if (file_from == -1 || read_bytes == -1)
+		{
+			dprintf(STDERR_FILENO, "Error: Can't read from file %s\n", argv[1]);
+			exit(98);
+		}
+		write_bytes = write(file_to, text, read_bytes);
+		if (file_to == -1 || write_bytes == -1)
+		{
+			dprintf(STDERR_FILENO, "Error: Can't write to %s\n", argv[2]);
+			exit(99);
+		}
+		read_bytes = read(file_from, text, 1024);
+		file_to = open(argv[2], O_WRONLY | O_APPEND);
+	} while (read_bytes > 0);
+	free(text);
+	close_func(file_from);
+	close_func(file_to);
 	return (0);
 }
